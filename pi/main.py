@@ -1,5 +1,6 @@
 import w1thermsensor
 from CharLCD import CharLCD
+from libs import NRF24
 
 lcd = CharLCD()
 sensor = w1thermsensor.W1ThermSensor()

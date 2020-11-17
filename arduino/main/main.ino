@@ -2,7 +2,7 @@
 #include <DallasTemperature.h>
 #include <SPI.h>
 #include <RF24.h>
-#include <printf.h>
+#include <string.h>
 RF24 radio(9,10);
 
 OneWire oneWire(A5); //Podłączenie do A5
@@ -21,12 +21,13 @@ void setup() {
 }
 
 void loop() {
-  const char text[] = "Hello World!";
+  sensors.requestTemperatures();//Pobranie temperatury czujnika
+  char text[5];
+  float temp = sensors.getTempCByIndex(0);
+  String tempString;
+  tempString = String(temp);
+  strcpy(text, tempString.c_str());
   radio.write(&text, sizeof(text));
-  
-  sensors.requestTemperatures(); //Pobranie temperatury czujnika
-  Serial.print("Aktualna temperatura: ");
-  Serial.println(sensors.getTempCByIndex(0));  //Wyswietlenie informacji
-  delay(1000);
+  delay(5000);
  
 }

@@ -10,45 +10,57 @@ sensor = w1thermsensor.W1ThermSensor()
 externalSensorError = 'Brak'
 lcdMessage = 'Dom: {} \nNa dworze: {}'
 
-lcd.begin(16,1)
+lcd.begin(16, 1)
 
 GPIO.setmode(GPIO.BCM)
 pipes = [[0xE8, 0xE8, 0xF0, 0xF0, 0xE1], [0xF0, 0xF0, 0xF0, 0xF0, 0xE1]]
 radio = NRF24(GPIO, spidev.SpiDev())
 radio.begin(0, 17)
 radio.powerUp()
-
 radio.setPayloadSize(32)
 radio.setChannel(0x76)
 radio.setDataRate(NRF24.BR_1MBPS)
 radio.setPALevel(NRF24.PA_MAX)
-
 radio.setAutoAck(True)
 radio.enableDynamicPayloads()
 radio.enableAckPayload()
-
-# radio.openReadingPipe(1, [140, 120, 0xf0, 0xf0, 0xe1])
 radio.openReadingPipe(1, pipes[1])
 radio.printDetails()
 radio.startListening()
 
-current_temp=0.0
+current_temp = 0.0
+external_currentTemp = 0.0
+timeOut = False
+
 while 1:
- while not radio.available(0):
-  time.sleep(1/100)
 
- receivedMessage = []
- radio.read(receivedMessage, radio.getDynamicPayloadSize())
- string = ""
- # pdb.set_trace()
- for n in receivedMessage:
-  if(n >= 32 and n <= 126):
-   string += chr(n)
- print("Received:{}".format(string))
- temp = round(sensor.get_temperature(), 1)
- if current_temp != temp:
-   lcd.clear()
-   lcd.message(lcdMessage.format(str(temp), externalSensorError))
-   current_temp = temp
+    start = time.time()
+    while not radio.available(0):
+        time.sleep(1/100)
+        if time.time() - start > 6:
+            print("Timed out.")
+            timeOut = True
+            break
 
-sleep(2)
+    if not timeOut:
+        receivedMessage = []
+        radio.read(receivedMessage, radio.getDynamicPayloadSize())
+        externalTempString = ""
+
+        for n in receivedMessage:
+            if (n >= 32 and n <= 126):
+                externalTempString += chr(n)
+        print("Received:{}".format(externalTempString))
+        externalTemp = round(float(externalTempString), 1)
+    else:
+        externalTemp = externalSensorError
+
+    temp = round(sensor.get_temperature(), 1)
+    if current_temp != temp or external_currentTemp != externalTemp:
+        lcd.clear()
+        lcd.message(lcdMessage.format(str(temp), externalTemp))
+        current_temp = temp
+        external_currentTemp = externalTemp
+
+    timeOut = False
+    time.sleep(2)

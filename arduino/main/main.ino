@@ -3,6 +3,7 @@
 #include <SPI.h>
 #include <RF24.h>
 #include <string.h>
+#include <printf.h>
 RF24 radio(9,10);
 
 OneWire oneWire(A5); //Podłączenie do A5
@@ -17,7 +18,7 @@ void setup() {
   radio.openWritingPipe(0xF0F0F0F0E1LL);
   radio.enableDynamicPayloads();
   radio.powerUp();
-
+  printf_begin();
 }
 
 void loop() {
@@ -27,7 +28,7 @@ void loop() {
   String tempString;
   tempString = String(temp);
   strcpy(text, tempString.c_str());
+  Serial.println(text);
   radio.write(&text, sizeof(text));
-  delay(5000);
- 
+  delay(1000);
 }

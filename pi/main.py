@@ -25,19 +25,26 @@ radio.setAutoAck(True)
 radio.enableDynamicPayloads()
 radio.enableAckPayload()
 radio.openReadingPipe(1, pipes[1])
+radio.openWritingPipe(pipes[0])
 radio.printDetails()
-radio.startListening()
 
 current_temp = 0.0
 external_currentTemp = 0.0
 timeOut = False
 
+command = list("GETTEMPERATURE")
+#Message has size of 32 bits, at the end zero needs to be appended
+while len(command) < 32:
+    command.append(0)
+
 while 1:
 
     start = time.time()
+    radio.write(command)
+    radio.startListening()
     while not radio.available(0):
         time.sleep(1/100)
-        if time.time() - start > 6:
+        if time.time() - start > 2:
             print("Timed out.")
             timeOut = True
             break
@@ -63,4 +70,5 @@ while 1:
         external_currentTemp = externalTemp
 
     timeOut = False
+    radio.stopListening()
     time.sleep(2)

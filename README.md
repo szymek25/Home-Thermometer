@@ -1,6 +1,7 @@
 # Home-Thermometer
 
 Hobby project for learning something after job.
+Code with connected remote thermometer can be found here: https://github.com/szymek25/Remote-Thermometer
 
 # Connection matrix
 

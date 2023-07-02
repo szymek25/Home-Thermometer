@@ -20,7 +20,7 @@ Code with connected remote thermometer can be found here: https://github.com/szy
 12   #12  
 13   #20  
 14   #21  
-15   5V  
+15   output from X9C103S  
 16   GND  
 
 
@@ -38,3 +38,8 @@ MOSI MOSI
 SCK SCLK  
 IRQ none   
 MISO MISO  
+
+## X9C103S PI
+CS #6  
+INC #19  
+UD #13  

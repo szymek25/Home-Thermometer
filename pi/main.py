@@ -4,11 +4,23 @@ from lib_nrf24 import NRF24
 import RPi.GPIO as GPIO
 import spidev
 import time
+import X9C103_BCM as pot
 
 lcd = CharLCD()
 sensor = w1thermsensor.W1ThermSensor()
 externalSensorError = 'Brak'
 lcdMessage = 'Dom: {} \nNa dworze: {}'
+
+# Set up digital potentiometer
+CS = 6
+INC = 19
+UD = 13
+pot.initiate(CS,INC,UD)
+pot.activate(CS,INC,UD)
+pot.wiperset(CS,INC,UD,1)
+# Set maximum value
+pot.wipermove(CS,INC,UD,100)
+
 
 lcd.begin(16, 1)
 
